@@ -95,8 +95,6 @@ object AlephiumActorSpec {
       s"""
          |akka {
          |  loglevel = "$logLevel"
-         |  loggers = ["akka.testkit.TestEventListener"]
-         |  logging-filter = "akka.event.slf4j.Slf4jLoggingFilter"
          |
          |  io.tcp.trace-logging = off
          |

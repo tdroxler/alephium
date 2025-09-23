@@ -29,6 +29,39 @@ import org.alephium.protocol.model.{Block, ChainIndex, NetworkId, Transaction}
 import org.alephium.protocol.vm.LockupScript
 import org.alephium.serde.deserialize
 import org.alephium.util._
+import java.nio.charset.StandardCharsets
+
+import java.io.{BufferedInputStream, FileNotFoundException}
+import java.nio.file.{Files => NioFiles, Path, StandardOpenOption}
+
+object ResourceIO extends StrictLogging {
+  private def openResource(resourcePath: String) = {
+    // Try both "/path" and "path"
+    val p1 = resourcePath
+    val p2 = resourcePath.stripPrefix("/")
+
+    Option(getClass.getResourceAsStream(p1))
+      .orElse(Option(getClass.getClassLoader.getResourceAsStream(p1)))
+      .orElse(Option(getClass.getResourceAsStream("/" + p2)))
+      .orElse(Option(getClass.getClassLoader.getResourceAsStream(p2)))
+      .map(new BufferedInputStream(_))
+      .getOrElse(throw new FileNotFoundException(s"Resource not found on classpath: $resourcePath"))
+  }
+
+  def copyFromResource(resourcePath: String, dest: Path): Unit = {
+    logger.info(s"Copying resource $resourcePath to $dest")
+    val in  = openResource(resourcePath)
+    logger.info(s"in: $in")
+    try {
+      val parent = dest.getParent
+      logger.info(s"parent: $parent")
+      if (parent != null) NioFiles.createDirectories(parent)
+      val out = NioFiles.newOutputStream(dest,
+        StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)
+      try discard(in.transferTo(out)) finally out.close()
+    } finally in.close()
+  }
+}
 
 @SuppressWarnings(Array("org.wartremover.warts.OptionPartial"))
 object Configs extends StrictLogging {
@@ -53,17 +86,115 @@ object Configs extends StrictLogging {
       templateName: String,
       overwrite: Boolean
   ): File = {
+    logger.info(s"Loading configuration template")
+    logger.info(s"Loading $confName configuration template: $templateName")
+    logger.info(s"Root path: $rootPath")
     val file = getConfigFile(rootPath, confName)
 
-    if (overwrite && file.exists()) { file.delete() }
+    logger.info(s"Configuration file path: $file")
+
+    logger.info(s"Overwrite: $overwrite")
+    logger.info(s"File exists: ${file.exists()}")
+    if (overwrite && file.exists()) {
+      logger.info(s"Deleting $file")
+      file.delete()
+    }
+
     if (!file.exists()) {
-      Files.copyFromResource(s"/$templateName.conf.tmpl", file.toPath)
+      logger.info(s"Creating new ${file.toPath} from template $templateName")
+//       val templateContent = this.getClass.getResourceAsStream(s"/$templateName.conf.tmpl")
+//       logger.info(s"Template content: $templateContent")
+//       val templateContent2 = this.getClass.getResourceAsStream(s"$templateName.conf.tmpl")
+//       logger.info(s"Template content2: $templateContent2")
+//       val templateContent3 = this.getClass.getResourceAsStream(s"/flow/src/main/resources/$templateName.conf.tmpl")
+//       logger.info(s"Template content3: $templateContent3")
+//       val templateContent4 = this.getClass.getResourceAsStream(s"flow/src/main/resources/$templateName.conf.tmpl")
+//       logger.info(s"Template content4: $templateContent4")
+// val in = getClass.getResourceAsStream("/system_prod.conf.tmpl")
+// logger.error(if (in != null) "Found!" else "Missing!")
+//       logger.info(s"in: $in")
+//       val inContent = scala.io.Source.fromInputStream(in, "UTF-8").mkString
+//       logger.info(s"inContent: $inContent")
+      logger.info(s"Copying template resource to ${file.toPath}")
+      ResourceIO.copyFromResource(s"/${templateName}.conf.tmpl", file.toPath)
+      logger.info(s"Copied template resource to ${file.toPath}")
+      // try {
+      //
+      //   // copyFromResource(s"$templateName.conf.tmpl", file.toPath)
+      //
+      //   val resourceName =
+      //   val target       = file.toPath
+      //
+      //   logger.info(s"Copying resource $resourceName to $target")
+      //   // val in = getClass.getResourceAsStream(resourceName)
+      //   //      val content = scala.io.Source.fromInputStream(in, "UTF-8").mkString
+      //   val resourcePath = s"$resourceName"
+      //   logger.info(s"Resource path: $resourcePath")
+      //   val in            = getClass.getResourceAsStream(resourcePath)
+      //   val resourcePath2 = s"/$resourceName"
+      //   logger.info(s"Resource path: $resourcePath2")
+      //   val in2 = getClass.getResourceAsStream(resourcePath2)
+      //   logger.info(s"in: $in")
+      //   logger.info(s"in2: $in2")
+      //   val content = scala.io.Source.fromInputStream(in2, "UTF-8").mkString
+      //   logger.info(s"WRITTING content")
+      //   JFiles.write(target, content.getBytes(StandardCharsets.UTF_8))
+      //   logger.info(s"WRITED")
+      //   val resourcePath3 = s"/network_mainnet.conf.tmpl"
+      //   logger.info(s"Resource path: $resourcePath3")
+      //   val in3 = getClass.getResourceAsStream(resourcePath3)
+      //   logger.info(s"in3: $in3")
+      //   if (in != null) { in.close() }
+      //   if (in2 != null) {
+      //     in2.close()
+      //   }
+      //   if (in3 != null) {
+      //     in3.close()
+      //   }
+      //
+      // } catch {
+      //   case e: Exception =>
+      //     logger.error(s"Failed to copy template resource to $file", e)
+      //     throw e
+      // }
+       logger.info(s"Created")
       if (!Env.isTestEnv) {
+        logger.info(s"Setting $file to read-only")
         file.setWritable(false)
       }
     }
 
+    logger.info(s"Using configuration file at $file \n")
     file
+  }
+
+  def copyFromResource(resourceName: String, target: Path): Unit = {
+    logger.info(s"Copying resource $resourceName to $target")
+    // val in = getClass.getResourceAsStream(resourceName)
+    //      val content = scala.io.Source.fromInputStream(in, "UTF-8").mkString
+    val resourcePath = s"$resourceName"
+    logger.info(s"Resource path: $resourcePath")
+    val in            = getClass.getResourceAsStream(resourcePath)
+    val resourcePath2 = s"/$resourceName"
+    logger.info(s"Resource path: $resourcePath2")
+    val in2 = getClass.getResourceAsStream(resourcePath2)
+    logger.info(s"in: $in")
+    logger.info(s"in2: $in2")
+    val content = scala.io.Source.fromInputStream(in2, "UTF-8").mkString
+    logger.info(s"WRITTING content")
+    JFiles.write(target, content.getBytes(StandardCharsets.UTF_8))
+    logger.info(s"WRITED")
+    val resourcePath3 = s"/network_mainnet.conf.tmpl"
+    logger.info(s"Resource path: $resourcePath3")
+    val in3 = getClass.getResourceAsStream(resourcePath3)
+    logger.info(s"in3: $in3")
+    if (in != null) { in.close() }
+    if (in2 != null) {
+      in2.close()
+    }
+    if (in3 != null) {
+      in3.close()
+    }
   }
 
   def getConfigFile(rootPath: Path, name: String): File = {
@@ -144,15 +275,17 @@ object Configs extends StrictLogging {
     val initialConfig = ConfigFactory.systemProperties().withFallback(predefined)
     val resultEither = for {
       userConfig <- parseConfigFile(getConfigUser(rootPath)).map(initialConfig.withFallback(_))
-      networkId  <- parseNetworkId(userConfig)
-      _          <- checkRootPath(rootPath, networkId)
+      networkId <- parseNetworkId(userConfig)
+      _ <- checkRootPath(rootPath, networkId)
       nodePath = getNodePath(rootPath, networkId)
-      systemConfig   <- parseConfigFile(getConfigSystem(env, nodePath, overwrite))
+      systemConfig <- parseConfigFile(getConfigSystem(env, nodePath, overwrite))
       _networkConfig <- parseConfigFile(getConfigNetwork(nodePath, networkId, overwrite))
       networkConfig = updateGenesis(networkId, _networkConfig)
     } yield userConfig.withFallback(networkConfig.withFallback(systemConfig)).resolve()
     resultEither match {
-      case Right(config) => config
+      case Right(config) =>
+        logger.info(s"CONFIG FILE GOOD")
+        config
       case Left(error) =>
         logger.error(error)
         throw new RuntimeException(error)

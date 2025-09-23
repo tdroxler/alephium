@@ -1,0 +1,13 @@
+{
+  "resources": {
+    "includes": [
+      { "pattern": "reference\\.conf" },
+      { "pattern": "application\\.conf" },
+      { "pattern": "version\\.(conf|json|properties)" },
+      { "pattern": "log4j2\\.xml" },
+      { "pattern": ".*\\.conf" },
+      { "pattern": ".*\\.tmpl" },
+      { "pattern": "mainnet_genesis\\.conf" }
+    ]
+  }
+}

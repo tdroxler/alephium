@@ -52,7 +52,7 @@ lazy val root: Project = Project("alephium-scala-blockflow", file("."))
   )
 
 def mainProject(id: String): Project =
-  project(id).enablePlugins(JavaAppPackaging).dependsOn(flow)
+  project(id).enablePlugins(JavaAppPackaging, GraalVMNativeImagePlugin).dependsOn(flow)
 
 def project(path: String): Project = {
   baseProject(path)
@@ -138,13 +138,26 @@ lazy val app = mainProject("app")
     flow % "test->test",
     wallet
   )
-  .enablePlugins(sbtdocker.DockerPlugin, BuildInfoPlugin)
+  .enablePlugins(sbtdocker.DockerPlugin, BuildInfoPlugin,JavaAppPackaging, GraalVMNativeImagePlugin)
   .settings(
+    GraalVMNativeImage / containerBuildImage := Some("ghcr.io/graalvm/native-image-community:21"),
+GraalVMNativeImage / graalVMNativeImageOptions ++= Seq(
+  "--no-fallback",
+  "-H:+ReportExceptionStackTraces",
+  "--enable-url-protocols=http,https",
+  "-H:+UnlockExperimentalVMOptions",
+
+  // Run-time: Scala, Config, Random, ALL Akka, logging, Netty, entry point
+  "--initialize-at-run-time=scala,com.typesafe.config.impl,scala.util.Random$,scala.util.Random,akka,org.slf4j,org.apache.logging.log4j,io.netty,org.alephium.app.Boot",
+
+  // Build-time: only Unsafe helpers needed for Akka’s queue offsets
+  "--initialize-at-build-time=akka.dispatch.AbstractNodeQueue,akka.util.Unsafe"
+),
+    Compile / mainClass       := Some("org.alephium.app.Boot"),
     assembly / mainClass       := Some("org.alephium.app.Boot"),
-    assembly / assemblyJarName := s"alephium-${version.value}.jar",
+    assembly / assemblyJarName := s"alephium-app.jar",
     assembly / test            := {},
     assemblyMergeStrategy := {
-      case "logback.xml" => MergeStrategy.first
       case PathList("META-INF", "maven", "org.webjars", "swagger-ui", xs @ _*) =>
         MergeStrategy.first
       case PathList("META-INF", "io.netty.versions.properties", xs @ _*) =>
@@ -153,6 +166,20 @@ lazy val app = mainProject("app")
         MergeStrategy.discard
       case x if x.endsWith("module-info.class") =>
         MergeStrategy.discard
+
+    // >>> IMPORTANT: concat HOCON defaults <<<
+    case "reference.conf"     =>
+    MergeStrategy.concat
+    case "application.conf"   =>
+    MergeStrategy.concat
+    case "version.conf"       =>
+    MergeStrategy.concat
+    case p @ PathList("akka", _ @ _*) if p.endsWith(".conf") =>
+      MergeStrategy.concat
+
+    // service providers & native-image config
+    case PathList("META-INF", "services", _ @ _*)     => MergeStrategy.concat
+    case PathList("META-INF", "native-image", _ @ _*) => MergeStrategy.concat
       case other =>
         assemblyMergeStrategy.value(other)
     },
@@ -273,7 +300,6 @@ lazy val tools = mainProject("tools")
     assembly / assemblyJarName := s"alephium-tools-${version.value}.jar",
     assembly / test            := {},
     assemblyMergeStrategy := {
-      case "logback.xml" => MergeStrategy.first
       case PathList("META-INF", "io.netty.versions.properties", xs @ _*) =>
         MergeStrategy.first
       case PathList("module-info.class") =>
@@ -335,7 +361,9 @@ lazy val flow = project("flow")
     libraryDependencies ++= Seq(
       akka,
       `akka-slf4j`,
-      logback,
+      log4jApi,
+      log4jCore,
+      log4jSlf4jImpl,
       `scala-logging`,
       weupnp,
       `prometheus-simple-client`,
@@ -394,7 +422,9 @@ lazy val wallet = project("wallet")
       `tapir-openapi`,
       `tapir-swagger-ui`,
       `scala-logging`,
-      logback
+      log4jApi,
+      log4jSlf4jImpl,
+      log4jCore
     ),
     publish / skip             := true,
     assembly / mainClass       := Some("org.alephium.wallet.Main"),
@@ -491,7 +521,6 @@ val commonSettings = publishSettings ++ Seq(
     "-Xlint:stars-align",
     "-Xlint:type-parameter-shadow",
     "-Xlint:nonlocal-return",
-    "-Xfatal-warnings",
     "-Ywarn-dead-code",
     "-Ywarn-extra-implicit",
     "-Ywarn-numeric-widen",

@@ -1,0 +1,9 @@
+docker run --rm \
+  -v "$PWD":/app -w /app \
+  ghcr.io/graalvm/native-image-community:24 \
+  native-image \
+    --no-fallback \
+    --initialize-at-build-time=org.apache.logging.log4j,org.apache.logging.slf4j \
+    --initialize-at-run-time=org.apache.logging.log4j.core.util.internal.UnsafeUtil,io.netty,io.vertx.core.http,io.vertx.core.net \
+    -jar  alephium-4.2.4+10-078cde0b+20250915-1954-SNAPSHOT.jar
+

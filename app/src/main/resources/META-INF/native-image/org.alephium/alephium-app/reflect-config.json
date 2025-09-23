@@ -1,0 +1,40 @@
+[
+  { "name": "akka.actor.LocalActorRefProvider",                    "allDeclaredConstructors": true },
+
+  { "name": "akka.actor.LightArrayRevolverScheduler",              "allDeclaredConstructors": true },
+
+  { "name": "akka.dispatch.UnboundedMailbox",                      "allDeclaredConstructors": true },
+  { "name": "akka.dispatch.BoundedMailbox",                        "allDeclaredConstructors": true },
+  { "name": "akka.dispatch.SingleConsumerOnlyUnboundedMailbox",    "allDeclaredConstructors": true },
+  { "name": "akka.dispatch.DefaultDispatcherConfigurator",         "allDeclaredConstructors": true },
+  { "name": "akka.routing.ConsistentHashingPool", "allDeclaredConstructors": true },
+
+{ "name": "akka.routing.RoundRobinPool", "allDeclaredConstructors": true },
+  { "name": "akka.event.slf4j.Slf4jLoggingFilter",                 "allDeclaredConstructors": true },
+  { "name": "akka.event.slf4j.Slf4jLogger",                        "allDeclaredConstructors": true },
+  {
+    "name": "akka.actor.ActorCell",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "akka.actor.LocalActorRefProvider",
+    "allPublicConstructors": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "akka.actor.RootActorPath",
+    "allPublicConstructors": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "akka.actor.LightArrayRevolverScheduler",
+    "allPublicConstructors": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "akka.util.Reflect",
+    "allDeclaredMethods": true
+  }
+]

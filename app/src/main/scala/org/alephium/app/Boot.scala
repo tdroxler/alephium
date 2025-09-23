@@ -38,6 +38,7 @@ object Boot extends App with StrictLogging {
     (new BootUp).init()
   } catch {
     case error: Throwable =>
+      logger.error(s"Cannot initialize system: ${error.getStackTrace}")
       logger.error(s"Cannot initialize system: $error")
       sys.exit(1)
   }
@@ -45,12 +46,19 @@ object Boot extends App with StrictLogging {
 
 @SuppressWarnings(Array("org.wartremover.warts.OptionPartial"))
 class BootUp extends StrictLogging {
+  logger.error("Starting Alephium node...")
   val rootPath: Path = Platform.getRootPath()
+  logger.info(s"Root path: $rootPath")
   val typesafeConfig: Config =
     Configs.parseConfigAndValidate(Env.currentEnv, rootPath, overwrite = true)
+  logger.info(s"Current environment: ${Env.currentEnv}")
+  logger.info(s"typesafeConfig:")
   implicit val config: AlephiumConfig = AlephiumConfig.load(typesafeConfig, "alephium")
-  implicit val apiConfig: ApiConfig   = ApiConfig.load(typesafeConfig, "alephium.api")
-  val flowSystem: ActorSystem         = ActorSystem("flow", typesafeConfig)
+  logger.info(s"Config:")
+  implicit val apiConfig: ApiConfig = ApiConfig.load(typesafeConfig, "alephium.api")
+  logger.info(s"ApiConfig:")
+  val flowSystem: ActorSystem = ActorSystem("flow", typesafeConfig)
+  logger.info(s"Alephium node started with ActorSystem")
 
   // Enable this for new upgrades
 //  if (config.network.networkId == NetworkId.AlephiumMainNet) {
