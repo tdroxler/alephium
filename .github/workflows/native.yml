@@ -3,9 +3,9 @@ name: Build native images (all platforms) and publish release
 on:
   push:
     branches:
-      - "**"   # run on any branch
+      - "**"
     tags:
-      - "v*"   # also run on tags (will publish a release)
+      - "v*"
   workflow_dispatch:
     inputs:
       tag_name:
@@ -29,31 +29,27 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Linux x86_64 (glibc)
           - os: ubuntu-22.04
             arch: x64
             file_ext: ""
             rocksdb_res: "librocksdbjni-linux64\\.so"
 
-          # macOS ARM64
           - os: macos-14
             arch: aarch64
             file_ext: ""
             rocksdb_res: "librocksdbjni-osx-arm64\\.jnilib"
 
-          # macOS x86_64
           - os: macos-13
             arch: x64
             file_ext: ""
             rocksdb_res: "librocksdbjni-osx-x86_64\\.jnilib"
 
-          # Windows x86_64
           - os: windows-latest
             arch: x64
             file_ext: ".exe"
             rocksdb_res: "librocksdbjni-win64\\.dll"
 
-          # OPTIONAL: Linux ARM64 (requires an ARM64 runner)
+          # Optional ARM64 Linux (requires ARM64 runner)
           # - os: ubuntu-24.04
           #   arch: aarch64
           #   file_ext: ""
@@ -62,6 +58,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       ROCKSDB_RES: ${{ matrix.rocksdb_res }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -71,8 +68,7 @@ jobs:
         with:
           distribution: graalvm-community
           java-version: 21
-          # components: native-image  # REMOVE (auto-included since JDK 17)
-          # architecture: …           # REMOVE (auto-detected from runner)
+          # native-image is auto-included for JDK 17+; no components/architecture inputs
 
       - name: Set up MSVC (Windows)
         if: runner.os == 'Windows'
@@ -80,7 +76,10 @@ jobs:
         with:
           arch: x64
 
-      - name: Cache sbt
+      - name: Set up sbt
+        uses: sbt/setup-sbt@v1
+
+      - name: Cache sbt/coursier
         uses: actions/cache@v4
         with:
           path: |
@@ -91,11 +90,16 @@ jobs:
             ~\AppData\Local\sbt
           key: sbt-${{ runner.os }}-${{ matrix.arch }}-${{ hashFiles('**/build.sbt', '**/project/**') }}
 
+      - name: Verify tools
+        run: |
+          java -version
+          sbt --version
+
       - name: Build native image
         shell: bash
         run: |
           set -euo pipefail
-          # Ensure Linux container image (if configured) is not used on macOS/Windows
+          # If your build.sbt uses a Linux container image, ensure it’s disabled on macOS/Windows:
           # sbt 'set ThisBuild / GraalVMNativeImage / containerBuildImage := None' "app/graalVMNativeImage"
           sbt "app/GraalVMNativeImage/packageBin"
 
