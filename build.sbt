@@ -130,7 +130,7 @@ lazy val api = project("api")
 val rocksdbResource: String =
   sys.env.getOrElse(
     "ROCKSDB_RES",
-"librocksdbjni-linux64\\.so""
+    "librocksdbjni-linux64\\.so"
   ) // sensible default for Linux x86_64
 
 lazy val app = mainProject("app")
