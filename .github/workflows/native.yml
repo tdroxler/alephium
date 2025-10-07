@@ -108,7 +108,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          sbt 'set ThisBuild / GraalVMNativeImage / containerBuildImage := None' "app/graalVMNativeImage"
+          sbt "app/GraalVMNativeImage/packageBin"
 
       - name: Locate and package binary
         id: pkg
