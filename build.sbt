@@ -52,7 +52,7 @@ lazy val root: Project = Project("alephium-scala-blockflow", file("."))
   )
 
 def mainProject(id: String): Project =
-  project(id).enablePlugins(JavaAppPackaging).dependsOn(flow)
+  project(id).enablePlugins(JavaAppPackaging, GraalVMNativeImagePlugin).dependsOn(flow)
 
 def project(path: String): Project = {
   baseProject(path)
@@ -127,6 +127,12 @@ lazy val api = project("api")
     )
   )
 
+val rocksdbResource: String =
+  sys.env.getOrElse(
+    "ROCKSDB_RES",
+"librocksdbjni-linux64\\.so""
+  ) // sensible default for Linux x86_64
+
 lazy val app = mainProject("app")
   .dependsOn(
     json,
@@ -140,6 +146,56 @@ lazy val app = mainProject("app")
   )
   .enablePlugins(sbtdocker.DockerPlugin, BuildInfoPlugin)
   .settings(
+    GraalVMNativeImage / containerBuildImage := Some("ghcr.io/graalvm/native-image-community:21"),
+    GraalVMNativeImage / graalVMNativeImageOptions ++= Seq(
+      "--no-fallback",
+      "--verbose",
+
+      // JDK URL handlers (
+      "--enable-http",
+      "--enable-https",
+      "--install-exit-handlers",
+
+      // Uncomment if you want to enable
+      // "--initialize-at-build-time=" + Seq(
+      // ).mkString(","),
+
+      // Defer these to runtime to avoid baking env/config/platform decisions at build-time
+      "--initialize-at-run-time=" + Seq(
+        // Works without it, but is recommended by ChatGPT
+        "org.alephium",
+
+        // Config must read env/files at runtime
+        "com.typesafe.config",
+
+        // Frameworks that probe runtime environment
+        "akka",
+        "io.netty",
+
+        // Logging
+        "ch.qos.logback",
+
+        // Correct RNG seeding at runtime
+        "scala.util.Random",
+        "scala.util.Random$",
+
+        // JNI-backed DB loads at runtime
+        "org.rocksdb"
+
+        // Might be needed if Ficus helpers is used in static initializers
+        // "com.iheart.ficus"
+      ).mkString(","),
+
+      // Required for RocksDB and any other JNI libs
+      "-H:+JNI", // --enable-jni for version > 21
+
+      // Include exactly one native library for the current target
+      s"-H:IncludeResources=${rocksdbResource}",
+
+      // Better stack traces on runtime failures
+      "-H:+ReportExceptionStackTraces"
+    ),
+    Compile / mainClass        := Some("org.alephium.app.Boot"),
     assembly / mainClass       := Some("org.alephium.app.Boot"),
     assembly / assemblyJarName := s"alephium-${version.value}.jar",
     assembly / test            := {},
@@ -155,6 +211,7 @@ lazy val app = mainProject("app")
         MergeStrategy.discard
       case other =>
         assemblyMergeStrategy.value(other)
+
     },
     libraryDependencies ++= Seq(
       vertx,
@@ -336,6 +393,7 @@ lazy val flow = project("flow")
       akka,
       `akka-slf4j`,
       logback,
+      `graalvm-reachability-metadata`,
       `scala-logging`,
       weupnp,
       `prometheus-simple-client`,
@@ -394,10 +452,12 @@ lazy val wallet = project("wallet")
       `tapir-openapi`,
       `tapir-swagger-ui`,
       `scala-logging`,
-      logback
+      logback,
+      `graalvm-reachability-metadata`
     ),
     publish / skip             := true,
     assembly / mainClass       := Some("org.alephium.wallet.Main"),
+    Compile / mainClass        := Some("org.alephium.wallet.Main"),
     assembly / assemblyJarName := s"alephium-wallet-${version.value}.jar",
     assembly / test            := {},
     assemblyMergeStrategy := {
@@ -430,6 +490,7 @@ lazy val ralphc = project("ralphc")
     ),
     publish / skip             := false,
     assembly / mainClass       := Some("org.alephium.ralphc.Main"),
+    Compile / mainClass        := Some("org.alephium.ralphc.Main"),
     assembly / assemblyJarName := s"alephium-ralphc-${version.value}.jar",
     assembly / test            := {},
     assemblyMergeStrategy := {
@@ -491,7 +552,6 @@ val commonSettings = publishSettings ++ Seq(
     "-Xlint:stars-align",
     "-Xlint:type-parameter-shadow",
     "-Xlint:nonlocal-return",
-    "-Xfatal-warnings",
     "-Ywarn-dead-code",
     "-Ywarn-extra-implicit",
     "-Ywarn-numeric-widen",

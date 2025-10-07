@@ -1,0 +1,189 @@
+name: Build native images and publish release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Tag name for the release (e.g., v1.2.3). Leave empty to use current branch/tag."
+        required: false
+      prerelease:
+        description: "Mark the release as a prerelease"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+env:
+  # Adjust if your native-image executable name differs
+  APP_NAME: alephium-app
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }} - ${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux x86_64 (glibc)
+          - os: ubuntu-22.04
+            arch: x64
+            graal_arch: x64
+            file_ext: ""
+            rocksdb_res: "librocksdbjni-linux64\\.so"
+            runner_os: Linux
+
+          # macOS ARM64
+          - os: macos-14
+            arch: aarch64
+            graal_arch: aarch64
+            file_ext: ""
+            rocksdb_res: "librocksdbjni-osx-arm64\\.jnilib"
+            runner_os: macOS
+
+          # macOS x86_64
+          - os: macos-13
+            arch: x64
+            graal_arch: x64
+            file_ext: ""
+            rocksdb_res: "librocksdbjni-osx-x86_64\\.jnilib"
+            runner_os: macOS
+
+          # Windows x86_64
+          - os: windows-latest
+            arch: x64
+            graal_arch: x64
+            file_ext: ".exe"
+            rocksdb_res: "librocksdbjni-win64\\.dll"
+            runner_os: Windows
+
+          # OPTIONAL: Linux ARM64 (requires an ARM64 runner; uncomment and provide a runner)
+          # - os: ubuntu-24.04  # or a self-hosted ARM64 runner
+          #   arch: aarch64
+          #   graal_arch: aarch64
+          #   file_ext: ""
+          #   rocksdb_res: "librocksdbjni-linux-aarch64\\.so"
+          #   runner_os: Linux
+
+    runs-on: ${{ matrix.os }}
+    env:
+      ROCKSDB_RES: ${{ matrix.rocksdb_res }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          distribution: graalvm-community
+          java-version: 21
+          components: native-image
+          architecture: ${{ matrix.graal_arch }}
+
+      # Windows needs MSVC environment for native-image linking
+      - name: Set up MSVC (Windows)
+        if: startsWith(matrix.os, 'windows')
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Cache sbt
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.coursier
+            ~/.sbt
+            ~\AppData\Local\Coursier\Cache
+            ~\AppData\Local\sbt
+          key: sbt-${{ runner.os }}-${{ matrix.arch }}-${{ hashFiles('**/build.sbt', '**/project/**') }}
+
+      # Ensure we don't try to use a Linux container image for non-Linux builds.
+      # This overrides any containerBuildImage setting in your sbt build on all OSes.
+      - name: Build native image
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Disable container image usage in sbt for this CI run
+          sbt 'set ThisBuild / GraalVMNativeImage / containerBuildImage := None' "app/graalVMNativeImage"
+
+      - name: Locate and package binary
+        id: pkg
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT_DIR="app/target/graalvm-native-image"
+          BIN_BASE="${OUT_DIR}/${APP_NAME}"
+          EXT="${{ matrix.file_ext }}"
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            BIN_PATH="${BIN_BASE}.exe"
+          else
+            BIN_PATH="${BIN_BASE}"
+          fi
+          test -f "$BIN_PATH" || { echo "Binary not found at $BIN_PATH"; ls -lah "$OUT_DIR"; exit 1; }
+
+          PKG_DIR="dist"
+          mkdir -p "$PKG_DIR"
+          TARGET_NAME="${APP_NAME}-${{ runner.os }}-${{ matrix.arch }}${EXT}"
+          cp "$BIN_PATH" "${PKG_DIR}/${TARGET_NAME}"
+          if [ "${{ runner.os }}" != "Windows" ]; then
+            chmod +x "${PKG_DIR}/${TARGET_NAME}"
+          fi
+
+          # Optional: generate checksum
+          if command -v shasum >/dev/null 2>&1; then
+            shasum -a 256 "${PKG_DIR}/${TARGET_NAME}" > "${PKG_DIR}/${TARGET_NAME}.sha256"
+          elif command -v sha256sum >/dev/null 2>&1; then
+            sha256sum "${PKG_DIR}/${TARGET_NAME}" > "${PKG_DIR}/${TARGET_NAME}.sha256"
+          fi
+
+          echo "artifact_path=${PKG_DIR}/${TARGET_NAME}" >> "$GITHUB_OUTPUT"
+          if [ -f "${PKG_DIR}/${TARGET_NAME}.sha256" ]; then
+            echo "checksum_path=${PKG_DIR}/${TARGET_NAME}.sha256" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}-${{ runner.os }}-${{ matrix.arch }}
+          path: |
+            ${{ steps.pkg.outputs.artifact_path }}
+            ${{ steps.pkg.outputs.checksum_path }}
+
+  release:
+    name: Create GitHub Release
+    needs: [build]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - name: Show downloaded files
+        run: |
+          ls -R dist
+
+      - name: Determine tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.tag_name }}" ]; then
+            echo "tag=${{ github.event.inputs.tag_name }}" >> "$GITHUB_OUTPUT"
+          else
+            # On tag push, github.ref_name is the tag (e.g., v1.2.3). On branch/manual without input, you could generate one.
+            echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: ${{ steps.tag.outputs.tag }}
+          prerelease: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.prerelease == 'true' }}
+          files: |
+            dist/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

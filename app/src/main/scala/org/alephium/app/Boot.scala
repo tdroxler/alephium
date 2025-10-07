@@ -31,7 +31,7 @@ import io.prometheus.client.hotspot.DefaultExports
 import org.alephium.flow.mining.Miner
 import org.alephium.flow.setting.{AlephiumConfig, Configs, Platform}
 import org.alephium.protocol.model.Block
-import org.alephium.util.{AVector, Duration, Env}
+import org.alephium.util.{AVector, Duration, Env, NativePlatform}
 
 object Boot extends App with StrictLogging {
   try {
@@ -45,6 +45,14 @@ object Boot extends App with StrictLogging {
 
 @SuppressWarnings(Array("org.wartremover.warts.OptionPartial"))
 class BootUp extends StrictLogging {
+
+  if (NativePlatform.inNativeImage) {
+    // Disable Netty's use of sun.misc.Unsafe in native-image
+    System.setProperty("io.netty.noUnsafe", "true")
+    // Optional but often useful with native-image:
+    // System.setProperty("io.netty.tryReflectionSetAccessible", "false")
+  }
+
   val rootPath: Path = Platform.getRootPath()
   val typesafeConfig: Config =
     Configs.parseConfigAndValidate(Env.currentEnv, rootPath, overwrite = true)
