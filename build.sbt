@@ -133,6 +133,7 @@ val rocksdbResource: String =
     "librocksdbjni-linux64\\.so"
   ) // sensible default for Linux x86_64
 
+val os = sys.props("os.name").toLowerCase
 lazy val app = mainProject("app")
   .dependsOn(
     json,
@@ -146,7 +147,12 @@ lazy val app = mainProject("app")
   )
   .enablePlugins(sbtdocker.DockerPlugin, BuildInfoPlugin)
   .settings(
-    GraalVMNativeImage / containerBuildImage := Some("ghcr.io/graalvm/native-image-community:21"),
+    GraalVMNativeImage / containerBuildImage := {
+  if (os.contains("linux")) Some("ghcr.io/graalvm/native-image-community:21")
+  else None
+},
+
+
     GraalVMNativeImage / graalVMNativeImageOptions ++= Seq(
       "--no-fallback",
       "--verbose",

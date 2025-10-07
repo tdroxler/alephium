@@ -20,7 +20,6 @@ permissions:
   contents: write
 
 env:
-  # Adjust if your native-image executable name differs
   APP_NAME: alephium-app
 
 jobs:
@@ -33,42 +32,32 @@ jobs:
           # Linux x86_64 (glibc)
           - os: ubuntu-22.04
             arch: x64
-            graal_arch: x64
             file_ext: ""
             rocksdb_res: "librocksdbjni-linux64\\.so"
-            runner_os: Linux
 
           # macOS ARM64
           - os: macos-14
             arch: aarch64
-            graal_arch: aarch64
             file_ext: ""
             rocksdb_res: "librocksdbjni-osx-arm64\\.jnilib"
-            runner_os: macOS
 
           # macOS x86_64
           - os: macos-13
             arch: x64
-            graal_arch: x64
             file_ext: ""
             rocksdb_res: "librocksdbjni-osx-x86_64\\.jnilib"
-            runner_os: macOS
 
           # Windows x86_64
           - os: windows-latest
             arch: x64
-            graal_arch: x64
             file_ext: ".exe"
             rocksdb_res: "librocksdbjni-win64\\.dll"
-            runner_os: Windows
 
-          # OPTIONAL: Linux ARM64 (needs ARM64 runner)
+          # OPTIONAL: Linux ARM64 (requires an ARM64 runner)
           # - os: ubuntu-24.04
           #   arch: aarch64
-          #   graal_arch: aarch64
           #   file_ext: ""
           #   rocksdb_res: "librocksdbjni-linux-aarch64\\.so"
-          #   runner_os: Linux
 
     runs-on: ${{ matrix.os }}
     env:
@@ -82,12 +71,11 @@ jobs:
         with:
           distribution: graalvm-community
           java-version: 21
-          components: native-image
-          architecture: ${{ matrix.graal_arch }}
+          # components: native-image  # REMOVE (auto-included since JDK 17)
+          # architecture: …           # REMOVE (auto-detected from runner)
 
-      # Windows needs MSVC environment for native-image linking
       - name: Set up MSVC (Windows)
-        if: startsWith(matrix.os, 'windows')
+        if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x64
@@ -103,11 +91,12 @@ jobs:
             ~\AppData\Local\sbt
           key: sbt-${{ runner.os }}-${{ matrix.arch }}-${{ hashFiles('**/build.sbt', '**/project/**') }}
 
-      # Ensure we don't try to use a Linux container image for non-Linux builds.
       - name: Build native image
         shell: bash
         run: |
           set -euo pipefail
+          # Ensure Linux container image (if configured) is not used on macOS/Windows
+          # sbt 'set ThisBuild / GraalVMNativeImage / containerBuildImage := None' "app/graalVMNativeImage"
           sbt "app/GraalVMNativeImage/packageBin"
 
       - name: Locate and package binary
@@ -117,7 +106,6 @@ jobs:
           set -euo pipefail
           OUT_DIR="app/target/graalvm-native-image"
           BIN_BASE="${OUT_DIR}/${APP_NAME}"
-          EXT="${{ matrix.file_ext }}"
           if [ "${{ runner.os }}" = "Windows" ]; then
             BIN_PATH="${BIN_BASE}.exe"
           else
@@ -127,13 +115,13 @@ jobs:
 
           PKG_DIR="dist"
           mkdir -p "$PKG_DIR"
-          TARGET_NAME="${APP_NAME}-${{ runner.os }}-${{ matrix.arch }}${EXT}"
+          TARGET_NAME="${APP_NAME}-${{ runner.os }}-${{ matrix.arch }}${{ matrix.file_ext }}"
           cp "$BIN_PATH" "${PKG_DIR}/${TARGET_NAME}"
           if [ "${{ runner.os }}" != "Windows" ]; then
             chmod +x "${PKG_DIR}/${TARGET_NAME}"
           fi
 
-          # Optional: generate checksum
+          # Optional checksum
           if command -v shasum >/dev/null 2>&1; then
             shasum -a 256 "${PKG_DIR}/${TARGET_NAME}" > "${PKG_DIR}/${TARGET_NAME}.sha256"
           elif command -v sha256sum >/dev/null 2>&1; then
@@ -157,7 +145,6 @@ jobs:
     name: Create GitHub Release (tags only)
     needs: [build]
     runs-on: ubuntu-22.04
-    # Only publish a release when the ref is a tag (e.g., refs/tags/v1.2.3)
     if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && github.event.inputs.tag_name != '')
     steps:
       - name: Download all artifacts
