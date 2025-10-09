@@ -31,7 +31,7 @@ import io.prometheus.client.hotspot.DefaultExports
 import org.alephium.flow.mining.Miner
 import org.alephium.flow.setting.{AlephiumConfig, Configs, Platform}
 import org.alephium.protocol.model.Block
-import org.alephium.util.{AVector, Duration, Env}
+import org.alephium.util.{AVector, Duration, Env, NativePlatform}
 
 object Boot extends App with StrictLogging {
   try {
@@ -45,6 +45,16 @@ object Boot extends App with StrictLogging {
 
 @SuppressWarnings(Array("org.wartremover.warts.OptionPartial"))
 class BootUp extends StrictLogging {
+
+  if (NativePlatform.inNativeImage) {
+    // Force Netty to avoid using sun.misc.Unsafe for buffer operations.
+    // This improves compatibility with GraalVM native-image and other restricted JVMs.
+    System.setProperty("io.netty.noUnsafe", "true")
+    // Disable Vert.x DNS JNDI resolver to prevent runtime errors with GraalVM native-image.
+    // This forces Vert.x to use standard JVM DNS resolution, avoiding JNDI and reflection issues.
+    System.setProperty("vertx.disableDnsResolver", "true")
+  }
+
   val rootPath: Path = Platform.getRootPath()
   val typesafeConfig: Config =
     Configs.parseConfigAndValidate(Env.currentEnv, rootPath, overwrite = true)
