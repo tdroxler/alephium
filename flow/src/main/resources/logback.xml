@@ -54,7 +54,7 @@
 
     <root>
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="ERRFILE"/>
-        <appender-ref ref="INFOFILE"/>
+        <!-- <appender-ref ref="ERRFILE"/> -->
+        <!-- <appender-ref ref="INFOFILE"/> -->
     </root>
 </configuration>
