@@ -44,6 +44,9 @@ object Dependencies {
   lazy val scalatestplus   = "org.scalatestplus"          %% "scalacheck-1-14" % "3.2.2.0" % Test
   lazy val weupnp          = "org.bitlet"                  % "weupnp"          % "0.1.4"
 
+  lazy val `graalvm-reachability-metadata` =
+    "org.graalvm.buildtools" % "graalvm-reachability-metadata" % "0.11.1"
+
   def `scala-reflect`(scalaVersion: String) = "org.scala-lang" % "scala-reflect" % scalaVersion
 
   lazy val `tapir-core`    = "com.softwaremill.sttp.tapir" %% "tapir-core"         % Version.tapir

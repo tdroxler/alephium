@@ -1,0 +1,1547 @@
+[
+  {
+    "name": "akka.actor.LocalActorRefProvider",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.String",
+          "akka.actor.ActorSystem$Settings",
+          "akka.event.EventStream",
+          "akka.actor.DynamicAccess"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.actor.LightArrayRevolverScheduler",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "com.typesafe.config.Config",
+          "akka.event.LoggingAdapter",
+          "java.util.concurrent.ThreadFactory"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.dispatch.SingleConsumerOnlyUnboundedMailbox",
+    "allDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ActorSystem$Settings",
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.dispatch.DefaultDispatcherConfigurator",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "akka.routing.ConsistentHashingPool",
+    "allDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.routing.RoundRobinPool",
+    "allDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.event.slf4j.Slf4jLoggingFilter",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ActorSystem$Settings",
+          "akka.event.EventStream"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.event.slf4j.Slf4jLogger",
+    "allDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>"
+      }
+    ]
+  },
+  {
+    "name": "akka.actor.ActorCell",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true,
+    "fields": [
+      { "name": "akka$actor$dungeon$Children$$_childrenRefsDoNotCallMeDirectly" },
+      { "name": "akka$actor$dungeon$Children$$_functionRefsDoNotCallMeDirectly" },
+      { "name": "akka$actor$dungeon$Children$$_nextNameDoNotCallMeDirectly" },
+      { "name": "akka$actor$dungeon$Dispatch$$_mailboxDoNotCallMeDirectly" }
+    ]
+  },
+  {
+    "name": "akka.actor.RootActorPath",
+    "allPublicConstructors": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "akka.util.Reflect",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "akka.dispatch.BoundedDequeBasedMessageQueueSemantics",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "akka.dispatch.UnboundedDequeBasedMessageQueueSemantics",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "akka.dispatch.BoundedControlAwareMessageQueueSemantics",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "akka.dispatch.ControlAwareMessageQueueSemantics",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "akka.dispatch.BoundedMessageQueueSemantics",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "akka.dispatch.UnboundedMessageQueueSemantics",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "akka.dispatch.DequeBasedMessageQueueSemantics",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "akka.dispatch.MultipleConsumerSemantics",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "akka.dispatch.BoundedMailbox",
+    "allDeclaredMethods": true,
+    "allPublicConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ActorSystem$Settings",
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.dispatch.UnboundedMailbox",
+    "allDeclaredMethods": true,
+    "allPublicConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ActorSystem$Settings",
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.dispatch.BoundedControlAwareMailbox",
+    "allDeclaredMethods": true,
+    "allPublicConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ActorSystem$Settings",
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.dispatch.UnboundedControlAwareMailbox",
+    "allDeclaredMethods": true,
+    "allPublicConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ActorSystem$Settings",
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.actor.LocalActorRefProvider$Guardian",
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.SupervisorStrategy"
+        ]
+      }
+    ],
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "akka.actor.LocalActorRefProvider$SystemGuardian",
+    "allDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.SupervisorStrategy",
+          "akka.actor.ActorRef"
+        ]
+      }
+    ],
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "akka.dispatch.SingleConsumerOnlyUnboundedConfigMailbox",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "akka.event.LoggerMailboxType",
+    "allPublicConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ActorSystem$Settings",
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.event.LoggerMessageQueueSemantics"
+  },
+  {
+    "name": "akka.event.EventStreamUnsubscriber",
+    "allDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.event.EventStream",
+          "boolean"
+        ]
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.event.EventStream",
+          "java.lang.Boolean"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.serialization.ByteArraySerializer",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ExtendedActorSystem"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.serialization.NullSerializer",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "akka.serialization.JavaSerializer",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ExtendedActorSystem"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.serialization.jackson.JacksonJsonSerializer",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "akka.serialization.jackson.JacksonCborSerializer",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "akka.serialization.SerializationExtension$",
+    "allDeclaredFields": true
+  },
+  {
+    "name": "akka.serialization.Serialization",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "akka.serialization.IntSerializer",
+    "allPublicConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ExtendedActorSystem"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.serialization.LongSerializer",
+    "allPublicConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ExtendedActorSystem"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.serialization.DoubleSerializer",
+    "allPublicConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "akka.serialization.StringSerializer",
+    "allPublicConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ExtendedActorSystem"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.serialization.BooleanSerializer",
+    "allPublicConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ExtendedActorSystem"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.serialization.DisabledJavaSerializer",
+    "allPublicConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ExtendedActorSystem"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.serialization.ByteStringSerializer",
+    "allPublicConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ExtendedActorSystem"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "org.alephium.util.DefaultStrategy",
+    "allPublicConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "akka.event.DeadLetterListener",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "akka.event.UnhandledMessageListener",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "ch.qos.logback.classic.joran.SerializedModelConfigurator",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ch.qos.logback.classic.util.DefaultJoranConfigurator",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ch.qos.logback.classic.BasicConfigurator",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ch.qos.logback.classic.joran.JoranConfigurator",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ch.qos.logback.classic.filter.ThresholdFilter",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ch.qos.logback.core.UnsynchronizedAppenderBase",
+    "methods": [
+      {
+        "name": "addFilter",
+        "parameterTypes": [
+          "ch.qos.logback.core.filter.Filter"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.netty.buffer.AbstractByteBufAllocator",
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "io.netty.buffer.AbstractReferenceCountedByteBuf",
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "io.netty.util.ReferenceCountUtil",
+    "allDeclaredMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "ch.qos.logback.core.ConsoleAppender",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ch.qos.logback.classic.encoder.PatternLayoutEncoder",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "queryAllPublicMethods": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "ch.qos.logback.classic.Logger"
+    },
+    "name": "ch.qos.logback.classic.pattern.DateConverter",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "ch.qos.logback.classic.Logger"
+    },
+    "name": "ch.qos.logback.classic.pattern.LevelConverter",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "ch.qos.logback.classic.Logger"
+    },
+    "name": "ch.qos.logback.classic.pattern.LineSeparatorConverter",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "ch.qos.logback.classic.Logger"
+    },
+    "name": "ch.qos.logback.classic.pattern.LoggerConverter",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "ch.qos.logback.classic.Logger"
+    },
+    "name": "ch.qos.logback.classic.pattern.MDCConverter",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "ch.qos.logback.classic.Logger"
+    },
+    "name": "ch.qos.logback.classic.pattern.MarkerConverter",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "ch.qos.logback.classic.Logger"
+    },
+    "name": "ch.qos.logback.classic.pattern.MessageConverter",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "ch.qos.logback.classic.Logger"
+    },
+    "name": "ch.qos.logback.classic.pattern.ThreadConverter",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "ch.qos.logback.classic.Logger"
+    },
+    "name": "ch.qos.logback.core.ConsoleAppender",
+    "queryAllPublicMethods": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "ch.qos.logback.classic.Logger"
+    },
+    "name": "ch.qos.logback.core.OutputStreamAppender",
+    "methods": [
+      {
+        "name": "setEncoder",
+        "parameterTypes": [
+          "ch.qos.logback.core.encoder.Encoder"
+        ]
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "ch.qos.logback.classic.Logger"
+    },
+    "name": "ch.qos.logback.core.encoder.Encoder",
+    "methods": [
+      {
+        "name": "valueOf",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "ch.qos.logback.classic.Logger"
+    },
+    "name": "ch.qos.logback.core.encoder.LayoutWrappingEncoder",
+    "methods": [
+      {
+        "name": "setParent",
+        "parameterTypes": [
+          "ch.qos.logback.core.spi.ContextAware"
+        ]
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "ch.qos.logback.classic.Logger"
+    },
+    "name": "ch.qos.logback.core.pattern.PatternLayoutEncoderBase",
+    "methods": [
+      {
+        "name": "setPattern",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "condition": {
+      "typeReachable": "ch.qos.logback.classic.Logger"
+    },
+    "name": "ch.qos.logback.core.spi.ContextAware",
+    "methods": [
+      {
+        "name": "valueOf",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "ch.qos.logback.core.FileAppender",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ch.qos.logback.core.OutputStreamAppender",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ch.qos.logback.core.rolling.RollingFileAppender",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ch.qos.logback.core.rolling.FixedWindowRollingPolicy",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "ch.qos.logback.core.rolling.TimeBasedRollingPolicy",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ch.qos.logback.core.rolling.RollingPolicyBase",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "akka.io.TcpManager",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "akka.io.UdpManager",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "akka.io.UdpConnectedManager",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "akka.io.SelectionHandler",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "akka.io.SelectionHandler$SelectorBasedManager",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "akka.io.SelectionHandler$Settings",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "akka.io.TcpListener",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "akka.io.TcpConnection",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "akka.io.TcpOutgoingConnection",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "akka.io.SelectionHandler$ChannelRegistryImpl",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "sun.misc.Unsafe",
+    "methods": [
+      {
+        "name": "arrayBaseOff",
+        "parameterTypes": [
+          "java.lang.Class"
+        ]
+      },
+      {
+        "name": "arrayIndexScale",
+        "parameterTypes": [
+          "java.lang.Class"
+        ]
+      },
+      {
+        "name": "copyMemory",
+        "parameterTypes": [
+          "long",
+          "long",
+          "long"
+        ]
+      },
+      {
+        "name": "copyMemory",
+        "parameterTypes": [
+          "java.lang.Object",
+          "long",
+          "java.lang.Object",
+          "long",
+          "long"
+        ]
+      },
+      {
+        "name": "getAndAddLong",
+        "parameterTypes": [
+          "java.lang.Object",
+          "long",
+          "long"
+        ]
+      },
+      {
+        "name": "getAndSetObject",
+        "parameterTypes": [
+          "java.lang.Object",
+          "long",
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "getBoolean",
+        "parameterTypes": [
+          "java.lang.Object",
+          "long"
+        ]
+      },
+      {
+        "name": "getByte",
+        "parameterTypes": [
+          "long"
+        ]
+      },
+      {
+        "name": "getByte",
+        "parameterTypes": [
+          "java.lang.Object",
+          "long"
+        ]
+      },
+      {
+        "name": "getDouble",
+        "parameterTypes": [
+          "java.lang.Object",
+          "long"
+        ]
+      },
+      {
+        "name": "getFloat",
+        "parameterTypes": [
+          "java.lang.Object",
+          "long"
+        ]
+      },
+      {
+        "name": "getInt",
+        "parameterTypes": [
+          "long"
+        ]
+      },
+      {
+        "name": "getInt",
+        "parameterTypes": [
+          "java.lang.Object",
+          "long"
+        ]
+      },
+      {
+        "name": "getLong",
+        "parameterTypes": [
+          "long"
+        ]
+      },
+      {
+        "name": "getLong",
+        "parameterTypes": [
+          "java.lang.Object",
+          "long"
+        ]
+      },
+      {
+        "name": "getObject",
+        "parameterTypes": [
+          "java.lang.Object",
+          "long"
+        ]
+      },
+      {
+        "name": "invokeCleaner",
+        "parameterTypes": [
+          "java.nio.ByteBuffer"
+        ]
+      },
+      {
+        "name": "objectFieldOffset",
+        "parameterTypes": [
+          "java.lang.reflect.Field"
+        ]
+      },
+      {
+        "name": "putBoolean",
+        "parameterTypes": [
+          "java.lang.Object",
+          "long",
+          "boolean"
+        ]
+      },
+      {
+        "name": "putByte",
+        "parameterTypes": [
+          "long",
+          "byte"
+        ]
+      },
+      {
+        "name": "putByte",
+        "parameterTypes": [
+          "java.lang.Object",
+          "long",
+          "byte"
+        ]
+      },
+      {
+        "name": "putDouble",
+        "parameterTypes": [
+          "java.lang.Object",
+          "long",
+          "double"
+        ]
+      },
+      {
+        "name": "putFloat",
+        "parameterTypes": [
+          "java.lang.Object",
+          "long",
+          "float"
+        ]
+      },
+      {
+        "name": "putInt",
+        "parameterTypes": [
+          "long",
+          "int"
+        ]
+      },
+      {
+        "name": "putInt",
+        "parameterTypes": [
+          "java.lang.Object",
+          "long",
+          "int"
+        ]
+      },
+      {
+        "name": "putLong",
+        "parameterTypes": [
+          "long",
+          "long"
+        ]
+      },
+      {
+        "name": "putLong",
+        "parameterTypes": [
+          "java.lang.Object",
+          "long",
+          "long"
+        ]
+      },
+      {
+        "name": "putObject",
+        "parameterTypes": [
+          "java.lang.Object",
+          "long",
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "storeFence"
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "akka.actor.RepointableRef",
+    "fields": [
+      {
+        "name": "_cellDoNotCallMeDirectly"
+      },
+      {
+        "name": "_lookupDoNotCallMeDirectly"
+      }
+    ]
+  },
+  {
+    "name": "akka.pattern.CircuitBreaker",
+    "fields": [
+      {
+        "name": "_currentResetTimeoutDoNotCallMeDirectly"
+      },
+      {
+        "name": "_currentStateDoNotCallMeDirectly"
+      }
+    ]
+  },
+  {
+    "name": "akka.pattern.PromiseActorRef",
+    "fields": [
+      {
+        "name": "_stateDoNotCallMeDirectly"
+      },
+      {
+        "name": "_watchedByDoNotCallMeDirectly"
+      }
+    ]
+  },
+  {
+    "name": "akka.actor.LightArrayRevolverScheduler$TaskHolder",
+    "fields": [
+      {
+        "name": "task"
+      }
+    ]
+  },
+  {
+    "name": "akka.actor.Props$EmptyActor",
+    "methods": [
+      {
+        "name": "<init>"
+      }
+    ]
+  },
+  {
+    "name": "akka.dispatch.affinity.ThrowOnOverflowRejectionHandler",
+    "methods": [
+      {
+        "name": "<init>"
+      }
+    ]
+  },
+  {
+    "name": "akka.dispatch.affinity.FairDistributionHashCache",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.event.Logging$DefaultLogger",
+    "methods": [
+      {
+        "name": "<init>"
+      }
+    ]
+  },
+  {
+    "name": "akka.event.DefaultLoggingFilter",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ActorSystem$Settings",
+          "akka.event.EventStream"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.io.InetAddressDnsProvider",
+    "methods": [
+      {
+        "name": "<init>"
+      }
+    ]
+  },
+  {
+    "name": "akka.io.SimpleDnsManager",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.io.DnsExt"
+        ]
+      }
+    ],
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "akka.io.dns.internal.AsyncDnsProvider",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.io.DnsExt"
+        ]
+      }
+    ],
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "akka.io.InetAddressDnsResolver",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.io.SimpleDnsCache",
+          "com.typesafe.config.Config"
+        ]
+      }
+    ],
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "akka.io.dns.internal.AsyncDnsResolver",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.io.SimpleDnsCache",
+          "com.typesafe.config.Config",
+          "scala.Function2<akka.actor.ActorRefFactory,scala.collection.immutable.List<java.net.InetSocketAddress>,scala.collection.immutable.List<akka.actor.ActorRef>>"
+        ]
+      }
+    ],
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "akka.io.dns.internal.AsyncDnsManager",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.io.DnsExt"
+        ]
+      }
+    ],
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "akka.routing.RoutedActorCell$RouterActorCreator",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.routing.RouterConfig"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "jdk.jfr.Recording",
+    "methods": [
+      {
+        "name": "<init>"
+      }
+    ]
+  },
+  {
+    "name": "akka.dispatch.BoundedDequeBasedMailbox",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ActorSystem$Settings",
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.dispatch.BoundedPriorityMailbox",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ActorSystem$Settings",
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.dispatch.BoundedStablePriorityMailbox",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ActorSystem$Settings",
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.dispatch.NonBlockingBoundedMailbox",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ActorSystem$Settings",
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.dispatch.UnboundedDequeBasedMailbox",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ActorSystem$Settings",
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.dispatch.UnboundedPriorityMailbox",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ActorSystem$Settings",
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.dispatch.UnboundedStablePriorityMailbox",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ActorSystem$Settings",
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.actor.CoordinatedShutdown$",
+    "fields": [
+      {
+        "name": "MODULE$"
+      }
+    ]
+  },
+  {
+    "name": "akka.event.AddressTerminatedTopic$",
+    "fields": [
+      {
+        "name": "MODULE$"
+      }
+    ]
+  },
+  {
+    "name": "akka.event.Logging$LogExt$",
+    "fields": [
+      {
+        "name": "MODULE$"
+      }
+    ]
+  },
+  {
+    "name": "akka.io.Dns$",
+    "fields": [
+      {
+        "name": "MODULE$"
+      }
+    ]
+  },
+  {
+    "name": "akka.io.Tcp$",
+    "fields": [
+      {
+        "name": "MODULE$"
+      }
+    ]
+  },
+  {
+    "name": "akka.io.Udp$",
+    "fields": [
+      {
+        "name": "MODULE$"
+      }
+    ]
+  },
+  {
+    "name": "akka.io.UdpConnected$",
+    "fields": [
+      {
+        "name": "MODULE$"
+      }
+    ]
+  },
+  {
+    "name": "akka.pattern.CircuitBreakersRegistry$",
+    "fields": [
+      {
+        "name": "MODULE$"
+      }
+    ]
+  },
+  {
+    "name": "akka.util.Clock$",
+    "fields": [
+      {
+        "name": "MODULE$"
+      }
+    ]
+  },
+  {
+    "name": "akka.util.ManifestInfo$",
+    "fields": [
+      {
+        "name": "MODULE$"
+      }
+    ]
+  },
+  {
+    "name": "akka.serialization.NullSerializer$",
+    "methods": [
+      {
+        "name": "<init>"
+      }
+    ]
+  },
+  {
+    "name": "scala.Int"
+  },
+  {
+    "name": "java.io.Serializable"
+  },
+  {
+    "name": "akka.util.ByteString$ByteString1C"
+  },
+  {
+    "name": "scala.Long"
+  },
+  {
+    "name": "java.lang.String"
+  },
+  {
+    "name": "scala.Boolean"
+  },
+  {
+    "name": "java.lang.Boolean"
+  },
+  {
+    "name": "akka.util.ByteString$ByteString1"
+  },
+  {
+    "name": "java.lang.Long"
+  },
+  {
+    "name": "[B"
+  },
+  {
+    "name": "java.lang.Integer"
+  },
+  {
+    "name": "akka.util.ByteString$ByteStrings"
+  },
+  {
+    "name": "akka.routing.BalancingPool",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.routing.BroadcastGroup",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.routing.BroadcastPool",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.routing.ConsistentHashingGroup",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.routing.FromConfig"
+  },
+  {
+    "name": "akka.routing.FromConfig$"
+  },
+  {
+    "name": "akka.routing.NoRouter$"
+  },
+  {
+    "name": "akka.routing.RandomGroup",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.routing.RandomPool",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.routing.RoundRobinGroup",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.routing.ScatterGatherFirstCompletedGroup",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.routing.ScatterGatherFirstCompletedPool",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.routing.SmallestMailboxPool",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.routing.TailChoppingGroup",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.routing.TailChoppingPool",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "com.typesafe.config.Config"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.event.LoggingFilterWithMarkerWrapper",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ActorSystem$Settings",
+          "akka.event.EventStream"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "akka.event.jul.JavaLoggingFilter",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "akka.actor.ActorSystem$Settings",
+          "akka.event.EventStream"
+        ]
+      }
+    ]
+  }
+]
