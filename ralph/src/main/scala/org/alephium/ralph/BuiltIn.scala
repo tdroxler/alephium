@@ -18,8 +18,6 @@ package org.alephium.ralph
 
 import java.util.Locale
 
-import scala.language.reflectiveCalls
-
 import akka.util.ByteString
 
 import org.alephium.protocol.model.dustUtxoAmount
@@ -125,127 +123,432 @@ object BuiltIn {
   // scalastyle:off parameter.number
   @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
   object SimpleBuiltIn {
-    private def tag[Ctx <: StatelessContext](category: Category) = new {
-      def apply(
-          name: String,
-          argsType: Seq[Type],
-          returnType: Seq[Type],
-          instr: Instr[Ctx],
-          argsName: Seq[(String, String)],
-          retComment: String,
-          doc: String,
-          usePreapprovedAssets: Boolean = false,
-          useAssetsInContract: Ast.ContractAssetsAnnotation = Ast.NotUseContractAssets
-      ): SimpleBuiltIn[Ctx] =
-        SimpleBuiltIn(
-          name,
-          argsType,
-          returnType,
-          Seq(instr),
-          usePreapprovedAssets,
-          UseContractAssetsInfo(useAssetsInContract, usePayToContractOnly = false),
-          category,
-          argsName,
-          retComment,
-          doc
-        )
-    }
+    private def tag[Ctx <: StatelessContext](category: Category)(
+        name: String,
+        argsType: Seq[Type],
+        returnType: Seq[Type],
+        instr: Instr[Ctx],
+        argsName: Seq[(String, String)],
+        retComment: String,
+        doc: String,
+        usePreapprovedAssets: Boolean,
+        useAssetsInContract: Ast.ContractAssetsAnnotation
+    ): SimpleBuiltIn[Ctx] =
+      SimpleBuiltIn(
+        name,
+        argsType,
+        returnType,
+        Seq(instr),
+        usePreapprovedAssets,
+        UseContractAssetsInfo(useAssetsInContract, usePayToContractOnly = false),
+        category,
+        argsName,
+        retComment,
+        doc
+      )
 
-    private def simpleReturn[Ctx <: StatelessContext](category: Category) = new {
-      def apply(
-          name: String,
-          argsType: Seq[Type],
-          returnType: Seq[Type],
-          instr: Instr[Ctx],
-          argsName: Seq[(String, String)],
-          retComment: String,
-          usePreapprovedAssets: Boolean = false,
-          useAssetsInContract: Ast.ContractAssetsAnnotation = Ast.NotUseContractAssets
-      ): SimpleBuiltIn[Ctx] =
-        SimpleBuiltIn(
-          name,
-          argsType,
-          returnType,
-          Seq(instr),
-          usePreapprovedAssets,
-          UseContractAssetsInfo(useAssetsInContract, usePayToContractOnly = false),
-          category,
-          argsName,
-          retComment,
-          doc = s"Returns $retComment."
-        )
-    }
+    private def simpleReturn[Ctx <: StatelessContext](category: Category)(
+        name: String,
+        argsType: Seq[Type],
+        returnType: Seq[Type],
+        instr: Instr[Ctx],
+        argsName: Seq[(String, String)],
+        retComment: String,
+        usePreapprovedAssets: Boolean,
+        useAssetsInContract: Ast.ContractAssetsAnnotation
+    ): SimpleBuiltIn[Ctx] =
+      SimpleBuiltIn(
+        name,
+        argsType,
+        returnType,
+        Seq(instr),
+        usePreapprovedAssets,
+        UseContractAssetsInfo(useAssetsInContract, usePayToContractOnly = false),
+        category,
+        argsName,
+        retComment,
+        doc = s"Returns $retComment."
+      )
 
-    private def multipleInstr[Ctx <: StatelessContext](category: Category) = new {
-      def apply(
-          name: String,
-          argsType: Seq[Type],
-          returnType: Seq[Type],
-          instrs: Seq[Instr[Ctx]],
-          argsName: Seq[(String, String)],
-          retComment: String,
-          doc: String,
-          usePreapprovedAssets: Boolean = false,
-          useAssetsInContract: Ast.ContractAssetsAnnotation = Ast.NotUseContractAssets
-      ): SimpleBuiltIn[Ctx] =
-        SimpleBuiltIn(
-          name,
-          argsType,
-          returnType,
-          instrs,
-          usePreapprovedAssets,
-          UseContractAssetsInfo(useAssetsInContract, usePayToContractOnly = false),
-          category,
-          argsName,
-          retComment,
-          doc
-        )
-    }
+    private[ralph] def multipleInstr[Ctx <: StatelessContext](category: Category)(
+        name: String,
+        argsType: Seq[Type],
+        returnType: Seq[Type],
+        instrs: Seq[Instr[Ctx]],
+        argsName: Seq[(String, String)],
+        retComment: String,
+        doc: String,
+        usePreapprovedAssets: Boolean,
+        useAssetsInContract: Ast.ContractAssetsAnnotation
+    ): SimpleBuiltIn[Ctx] =
+      SimpleBuiltIn(
+        name,
+        argsType,
+        returnType,
+        instrs,
+        usePreapprovedAssets,
+        UseContractAssetsInfo(useAssetsInContract, usePayToContractOnly = false),
+        category,
+        argsName,
+        retComment,
+        doc
+      )
 
-    private def multipleInstrReturn[Ctx <: StatelessContext](category: Category) = new {
-      def apply(
-          name: String,
-          argsType: Seq[Type],
-          returnType: Seq[Type],
-          instrs: Seq[Instr[Ctx]],
-          argsName: Seq[(String, String)],
-          retComment: String,
-          usePreapprovedAssets: Boolean = false,
-          useAssetsInContract: Ast.ContractAssetsAnnotation = Ast.NotUseContractAssets
-      ): SimpleBuiltIn[Ctx] =
-        SimpleBuiltIn(
-          name,
-          argsType,
-          returnType,
-          instrs,
-          usePreapprovedAssets,
-          UseContractAssetsInfo(useAssetsInContract, usePayToContractOnly = false),
-          category,
-          argsName,
-          retComment,
-          doc = s"Returns $retComment."
-        )
-    }
+    private def multipleInstrReturn[Ctx <: StatelessContext](category: Category)(
+        name: String,
+        argsType: Seq[Type],
+        returnType: Seq[Type],
+        instrs: Seq[Instr[Ctx]],
+        argsName: Seq[(String, String)],
+        retComment: String,
+        usePreapprovedAssets: Boolean,
+        useAssetsInContract: Ast.ContractAssetsAnnotation
+    ): SimpleBuiltIn[Ctx] =
+      SimpleBuiltIn(
+        name,
+        argsType,
+        returnType,
+        instrs,
+        usePreapprovedAssets,
+        UseContractAssetsInfo(useAssetsInContract, usePayToContractOnly = false),
+        category,
+        argsName,
+        retComment,
+        doc = s"Returns $retComment."
+      )
 
-    private[ralph] val cryptography = tag[StatelessContext](Category.Cryptography)
-    private[ralph] val cryptographyMultipleInstr =
-      multipleInstr[StatelessContext](Category.Cryptography)
-    private[ralph] val chain       = tag[StatelessContext](Category.Chain)
-    private[ralph] val conversion  = tag[StatelessContext](Category.Conversion)
-    private[ralph] val byteVec     = tag[StatelessContext](Category.ByteVec)
-    private[ralph] val asset       = tag[StatefulContext](Category.Asset)
-    private[ralph] val contract    = tag[StatefulContext](Category.Contract)
-    private[ralph] val subContract = tag[StatefulContext](Category.SubContract)
+    private[ralph] def cryptography(
+        name: String,
+        argsType: Seq[Type],
+        returnType: Seq[Type],
+        instr: Instr[StatelessContext],
+        argsName: Seq[(String, String)],
+        retComment: String,
+        doc: String,
+        usePreapprovedAssets: Boolean = false,
+        useAssetsInContract: Ast.ContractAssetsAnnotation = Ast.NotUseContractAssets
+    ): SimpleBuiltIn[StatelessContext] =
+      tag[StatelessContext](Category.Cryptography)(
+        name,
+        argsType,
+        returnType,
+        instr,
+        argsName,
+        retComment,
+        doc,
+        usePreapprovedAssets,
+        useAssetsInContract
+      )
 
-    private[ralph] val chainSimple    = simpleReturn[StatelessContext](Category.Chain)
-    private[ralph] val byteVecSimple  = simpleReturn[StatelessContext](Category.ByteVec)
-    private[ralph] val assetSimple    = simpleReturn[StatefulContext](Category.Asset)
-    private[ralph] val contractSimple = simpleReturn[StatefulContext](Category.Contract)
+    private[ralph] def cryptographyMultipleInstr(
+        name: String,
+        argsType: Seq[Type],
+        returnType: Seq[Type],
+        instrs: Seq[Instr[StatelessContext]],
+        argsName: Seq[(String, String)],
+        retComment: String,
+        doc: String,
+        usePreapprovedAssets: Boolean = false,
+        useAssetsInContract: Ast.ContractAssetsAnnotation = Ast.NotUseContractAssets
+    ): SimpleBuiltIn[StatelessContext] =
+      multipleInstr[StatelessContext](Category.Cryptography)(
+        name,
+        argsType,
+        returnType,
+        instrs,
+        argsName,
+        retComment,
+        doc,
+        usePreapprovedAssets,
+        useAssetsInContract
+      )
 
-    private[BuiltIn] def utils[Ctx <: StatelessContext]       = tag[Ctx](Category.Utils)
-    private[BuiltIn] def utilsSimple[Ctx <: StatelessContext] = simpleReturn[Ctx](Category.Utils)
-    private[BuiltIn] def utilsMultipleInstr[Ctx <: StatelessContext] =
-      multipleInstrReturn[Ctx](Category.Utils)
+    private[ralph] def chain[Ctx <: StatelessContext](
+        name: String,
+        argsType: Seq[Type],
+        returnType: Seq[Type],
+        instr: Instr[Ctx],
+        argsName: Seq[(String, String)],
+        retComment: String,
+        doc: String,
+        usePreapprovedAssets: Boolean = false,
+        useAssetsInContract: Ast.ContractAssetsAnnotation = Ast.NotUseContractAssets
+    ): SimpleBuiltIn[Ctx] =
+      tag[Ctx](Category.Chain)(
+        name,
+        argsType,
+        returnType,
+        instr,
+        argsName,
+        retComment,
+        doc,
+        usePreapprovedAssets,
+        useAssetsInContract
+      )
+
+    private[ralph] def conversion(
+        name: String,
+        argsType: Seq[Type],
+        returnType: Seq[Type],
+        instr: Instr[StatelessContext],
+        argsName: Seq[(String, String)],
+        retComment: String,
+        doc: String,
+        usePreapprovedAssets: Boolean = false,
+        useAssetsInContract: Ast.ContractAssetsAnnotation = Ast.NotUseContractAssets
+    ): SimpleBuiltIn[StatelessContext] =
+      tag[StatelessContext](Category.Conversion)(
+        name,
+        argsType,
+        returnType,
+        instr,
+        argsName,
+        retComment,
+        doc,
+        usePreapprovedAssets,
+        useAssetsInContract
+      )
+
+    private[ralph] def byteVec(
+        name: String,
+        argsType: Seq[Type],
+        returnType: Seq[Type],
+        instr: Instr[StatelessContext],
+        argsName: Seq[(String, String)],
+        retComment: String,
+        doc: String,
+        usePreapprovedAssets: Boolean = false,
+        useAssetsInContract: Ast.ContractAssetsAnnotation = Ast.NotUseContractAssets
+    ): SimpleBuiltIn[StatelessContext] =
+      tag[StatelessContext](Category.ByteVec)(
+        name,
+        argsType,
+        returnType,
+        instr,
+        argsName,
+        retComment,
+        doc,
+        usePreapprovedAssets,
+        useAssetsInContract
+      )
+
+    private[ralph] def asset[Ctx <: StatelessContext](
+        name: String,
+        argsType: Seq[Type],
+        returnType: Seq[Type],
+        instr: Instr[Ctx],
+        argsName: Seq[(String, String)],
+        retComment: String,
+        doc: String,
+        usePreapprovedAssets: Boolean = false,
+        useAssetsInContract: Ast.ContractAssetsAnnotation = Ast.NotUseContractAssets
+    ): SimpleBuiltIn[Ctx] =
+      tag[Ctx](Category.Asset)(
+        name,
+        argsType,
+        returnType,
+        instr,
+        argsName,
+        retComment,
+        doc,
+        usePreapprovedAssets,
+        useAssetsInContract
+      )
+
+    private[ralph] def contract[Ctx <: StatefulContext](
+        name: String,
+        argsType: Seq[Type],
+        returnType: Seq[Type],
+        instr: Instr[Ctx],
+        argsName: Seq[(String, String)],
+        retComment: String,
+        doc: String,
+        usePreapprovedAssets: Boolean = false,
+        useAssetsInContract: Ast.ContractAssetsAnnotation = Ast.NotUseContractAssets
+    ): SimpleBuiltIn[Ctx] =
+      tag[Ctx](Category.Contract)(
+        name,
+        argsType,
+        returnType,
+        instr,
+        argsName,
+        retComment,
+        doc,
+        usePreapprovedAssets,
+        useAssetsInContract
+      )
+
+    private[ralph] def subContract[Ctx <: StatefulContext](
+        name: String,
+        argsType: Seq[Type],
+        returnType: Seq[Type],
+        instr: Instr[Ctx],
+        argsName: Seq[(String, String)],
+        retComment: String,
+        doc: String,
+        usePreapprovedAssets: Boolean = false,
+        useAssetsInContract: Ast.ContractAssetsAnnotation = Ast.NotUseContractAssets
+    ): SimpleBuiltIn[Ctx] =
+      tag[Ctx](Category.SubContract)(
+        name,
+        argsType,
+        returnType,
+        instr,
+        argsName,
+        retComment,
+        doc,
+        usePreapprovedAssets,
+        useAssetsInContract
+      )
+
+    private[ralph] def chainSimple[Ctx <: StatelessContext](
+        name: String,
+        argsType: Seq[Type],
+        returnType: Seq[Type],
+        instr: Instr[Ctx],
+        argsName: Seq[(String, String)],
+        retComment: String,
+        usePreapprovedAssets: Boolean = false,
+        useAssetsInContract: Ast.ContractAssetsAnnotation = Ast.NotUseContractAssets
+    ): SimpleBuiltIn[Ctx] =
+      simpleReturn(Category.Chain)(
+        name,
+        argsType,
+        returnType,
+        instr,
+        argsName,
+        retComment,
+        usePreapprovedAssets,
+        useAssetsInContract
+      )
+
+    private[ralph] def byteVecSimple[Ctx <: StatelessContext](
+        name: String,
+        argsType: Seq[Type],
+        returnType: Seq[Type],
+        instr: Instr[Ctx],
+        argsName: Seq[(String, String)],
+        retComment: String,
+        usePreapprovedAssets: Boolean = false,
+        useAssetsInContract: Ast.ContractAssetsAnnotation = Ast.NotUseContractAssets
+    ): SimpleBuiltIn[Ctx] =
+      simpleReturn(Category.ByteVec)(
+        name,
+        argsType,
+        returnType,
+        instr,
+        argsName,
+        retComment,
+        usePreapprovedAssets,
+        useAssetsInContract
+      )
+
+    private[ralph] def assetSimple[Ctx <: StatelessContext](
+        name: String,
+        argsType: Seq[Type],
+        returnType: Seq[Type],
+        instr: Instr[Ctx],
+        argsName: Seq[(String, String)],
+        retComment: String,
+        usePreapprovedAssets: Boolean = false,
+        useAssetsInContract: Ast.ContractAssetsAnnotation = Ast.NotUseContractAssets
+    ): SimpleBuiltIn[Ctx] =
+      simpleReturn(Category.Asset)(
+        name,
+        argsType,
+        returnType,
+        instr,
+        argsName,
+        retComment,
+        usePreapprovedAssets,
+        useAssetsInContract
+      )
+
+    private[ralph] def contractSimple[Ctx <: StatelessContext](
+        name: String,
+        argsType: Seq[Type],
+        returnType: Seq[Type],
+        instr: Instr[Ctx],
+        argsName: Seq[(String, String)],
+        retComment: String,
+        usePreapprovedAssets: Boolean = false,
+        useAssetsInContract: Ast.ContractAssetsAnnotation = Ast.NotUseContractAssets
+    ): SimpleBuiltIn[Ctx] =
+      simpleReturn(Category.Contract)(
+        name,
+        argsType,
+        returnType,
+        instr,
+        argsName,
+        retComment,
+        usePreapprovedAssets,
+        useAssetsInContract
+      )
+
+    private[ralph] def utils[Ctx <: StatelessContext](
+        name: String,
+        argsType: Seq[Type],
+        returnType: Seq[Type],
+        instr: Instr[Ctx],
+        argsName: Seq[(String, String)],
+        retComment: String,
+        doc: String,
+        usePreapprovedAssets: Boolean = false,
+        useAssetsInContract: Ast.ContractAssetsAnnotation = Ast.NotUseContractAssets
+    ): SimpleBuiltIn[Ctx] =
+      tag(Category.Utils)(
+        name,
+        argsType,
+        returnType,
+        instr,
+        argsName,
+        retComment,
+        doc,
+        usePreapprovedAssets,
+        useAssetsInContract
+      )
+
+    private[ralph] def utilsSimple[Ctx <: StatelessContext](
+        name: String,
+        argsType: Seq[Type],
+        returnType: Seq[Type],
+        instr: Instr[Ctx],
+        argsName: Seq[(String, String)],
+        retComment: String,
+        usePreapprovedAssets: Boolean = false,
+        useAssetsInContract: Ast.ContractAssetsAnnotation = Ast.NotUseContractAssets
+    ): SimpleBuiltIn[Ctx] =
+      simpleReturn(Category.Utils)(
+        name,
+        argsType,
+        returnType,
+        instr,
+        argsName,
+        retComment,
+        usePreapprovedAssets,
+        useAssetsInContract
+      )
+
+    private[ralph] def utilsMultipleInstr[Ctx <: StatelessContext](
+        name: String,
+        argsType: Seq[Type],
+        returnType: Seq[Type],
+        instrs: Seq[Instr[Ctx]],
+        argsName: Seq[(String, String)],
+        retComment: String,
+        usePreapprovedAssets: Boolean = false,
+        useAssetsInContract: Ast.ContractAssetsAnnotation = Ast.NotUseContractAssets
+    ): SimpleBuiltIn[Ctx] =
+      multipleInstrReturn(Category.Utils)(
+        name,
+        argsType,
+        returnType,
+        instrs,
+        argsName,
+        retComment,
+        usePreapprovedAssets,
+        useAssetsInContract
+      )
 
     def hash(
         name: String,
