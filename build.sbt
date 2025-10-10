@@ -140,7 +140,7 @@ lazy val app = mainProject("app")
   )
   .enablePlugins(sbtdocker.DockerPlugin, BuildInfoPlugin,JavaAppPackaging, GraalVMNativeImagePlugin)
   .settings(
-    GraalVMNativeImage / containerBuildImage := Some("ghcr.io/graalvm/native-image-community:21"),
+    GraalVMNativeImage / containerBuildImage := None,
 GraalVMNativeImage / graalVMNativeImageOptions ++= Seq(
   "--no-fallback",
   "-H:+ReportExceptionStackTraces",
