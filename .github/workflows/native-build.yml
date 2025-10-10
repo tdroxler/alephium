@@ -98,9 +98,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # If your build.sbt uses a Linux container image, ensure it’s disabled on macOS/Windows:
-          # sbt 'set ThisBuild / GraalVMNativeImage / containerBuildImage := None' "app/graalVMNativeImage"
-          sbt "app/GraalVMNativeImage/packageBin"
+          if [[ "${{ runner.os }}" == "macOS" || "${{ runner.os }}" == "Windows" ]]; then
+            sbt 'set ThisBuild / GraalVMNativeImage / containerBuildImage := None' "app/GraalVMNativeImage/packageBin"
+          else
+            sbt "app/GraalVMNativeImage/packageBin"
+          fi
       - name: Locate and package binary
         id: pkg
         shell: bash
