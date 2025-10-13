@@ -49,8 +49,9 @@ class BootUp extends StrictLogging {
   if (NativePlatform.inNativeImage) {
     // Disable Netty's use of sun.misc.Unsafe in native-image
     System.setProperty("io.netty.noUnsafe", "true")
-    // Optional but often useful with native-image:
-    // System.setProperty("io.netty.tryReflectionSetAccessible", "false")
+    System.setProperty("io.netty.tryReflectionSetAccessible", "true")
+    // Disable Vert.x DNS JNDI resolver to avoid NPE
+    //System.setProperty("vertx.disableDnsResolver", "true")
   }
 
   val rootPath: Path = Platform.getRootPath()
