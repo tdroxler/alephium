@@ -91,6 +91,7 @@ jobs:
 
       - name: Get version from tag
         id: get_version
+        shell: bash
         run: |
           if [[ "${GITHUB_REF:-}" =~ refs/tags/v(.+) ]]; then
             V="${BASH_REMATCH[1]}"
