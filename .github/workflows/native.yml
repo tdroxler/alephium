@@ -168,8 +168,14 @@ jobs:
       - name: Show downloaded files
         run: ls -R dist
 
+      - name: Move all release binaries into natives/ subfolder
+        run: |
+          mkdir -p dist/natives
+          find dist -mindepth 2 -type f -exec mv -t dist/natives {} +
+
       - name: Determine tag
         id: tag
+        shell: bash
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.tag_name }}" ]; then
             echo "tag=${{ github.event.inputs.tag_name }}" >> "$GITHUB_OUTPUT"
@@ -184,6 +190,6 @@ jobs:
           name: ${{ steps.tag.outputs.tag }}
           prerelease: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.prerelease == 'true' }}
           files: |
-            dist/natives/**/*
+            dist/natives/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
