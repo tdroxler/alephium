@@ -1,0 +1,190 @@
+name: Build native images (all platforms) and publish release
+
+on:
+  push:
+    branches:
+      - "**"
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Optional tag name for manual release (e.g., v1.2.3). Leave empty to just build without release."
+        required: false
+      prerelease:
+        description: "Mark release as a prerelease (manual runs only)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+env:
+  APP_NAME: alephium
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }} - ${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            arch: x64
+            file_ext: ""
+            rocksdb_res: "librocksdbjni-linux64\\.so"
+          - os: macos-14
+            arch: aarch64
+            file_ext: ""
+            rocksdb_res: "librocksdbjni-osx-arm64\\.jnilib"
+          - os: macos-13
+            arch: x64
+            file_ext: ""
+            rocksdb_res: "librocksdbjni-osx-x86_64\\.jnilib"
+          - os: windows-latest
+            arch: x64
+            file_ext: ".exe"
+            rocksdb_res: "librocksdbjni-win64\\.dll"
+          - os: ubuntu-24.04
+            arch: aarch64
+            file_ext: ""
+            rocksdb_res: "librocksdbjni-linux-aarch64\\.so"
+
+    runs-on: ${{ matrix.os }}
+    env:
+      ROCKSDB_RES: ${{ matrix.rocksdb_res }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          distribution: graalvm-community
+          java-version: 21
+
+      - name: Set up MSVC (Windows)
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Set up sbt
+        uses: sbt/setup-sbt@v1
+
+      - name: Cache sbt/coursier
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.coursier
+            ~/.sbt
+            ~\AppData\Local\Coursier\Cache
+            ~\AppData\Local\sbt
+          key: sbt-${{ runner.os }}-${{ matrix.arch }}-${{ hashFiles('**/build.sbt', '**/project/**') }}
+
+      - name: Verify tools
+        run: |
+          java -version
+          sbt --version
+
+      - name: Get version from tag
+        id: get_version
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF:-}" =~ refs/tags/v(.+) ]]; then
+            V="${BASH_REMATCH[1]}"
+          elif [[ "${{ github.event.inputs.tag_name }}" =~ v(.+) ]]; then
+            V="${BASH_REMATCH[1]}"
+          else
+            V="dev"
+          fi
+          echo "VERSION=$V" >> $GITHUB_ENV
+          echo "version=$V" >> $GITHUB_OUTPUT
+
+      - name: Build native image
+        shell: bash
+        run: |
+          set -euo pipefail
+          sbt "app/GraalVMNativeImage/packageBin"
+
+      - name: Locate and package binary
+        id: pkg
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT_DIR="app/target/graalvm-native-image"
+          BIN_BASE="${OUT_DIR}/${APP_NAME}"
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            BIN_PATH="${BIN_BASE}.exe"
+          else
+            BIN_PATH="${BIN_BASE}"
+          fi
+          test -f "$BIN_PATH" || { echo "Binary not found at $BIN_PATH"; ls -lah "$OUT_DIR"; exit 1; }
+
+          # Use a subfolder for all native images (e.g. natives/)
+          PKG_DIR="dist/natives"
+          mkdir -p "$PKG_DIR"
+
+          # Name includes version, OS, arch, and extension
+          TARGET_NAME="${APP_NAME}-${{ env.VERSION }}-${{ runner.os }}-${{ matrix.arch }}${{ matrix.file_ext }}"
+          cp "$BIN_PATH" "${PKG_DIR}/${TARGET_NAME}"
+          if [ "${{ runner.os }}" != "Windows" ]; then
+            chmod +x "${PKG_DIR}/${TARGET_NAME}"
+          fi
+
+          # Optional checksum
+          if command -v shasum >/dev/null 2>&1; then
+            shasum -a 256 "${PKG_DIR}/${TARGET_NAME}" > "${PKG_DIR}/${TARGET_NAME}.sha256"
+          elif command -v sha256sum >/dev/null 2>&1; then
+            sha256sum "${PKG_DIR}/${TARGET_NAME}" > "${PKG_DIR}/${TARGET_NAME}.sha256"
+          fi
+
+          echo "artifact_path=${PKG_DIR}/${TARGET_NAME}" >> "$GITHUB_OUTPUT"
+          if [ -f "${PKG_DIR}/${TARGET_NAME}.sha256" ]; then
+            echo "checksum_path=${PKG_DIR}/${TARGET_NAME}.sha256" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}-${{ runner.os }}-${{ matrix.arch }}
+          path: |
+            ${{ steps.pkg.outputs.artifact_path }}
+            ${{ steps.pkg.outputs.checksum_path }}
+
+  release:
+    name: Create GitHub Release (tags only)
+    needs: [build]
+    runs-on: ubuntu-22.04
+    if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && github.event.inputs.tag_name != '')
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - name: Show downloaded files
+        run: ls -R dist
+
+      - name: Determine tag
+        id: tag
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.tag_name }}" ]; then
+            echo "tag=${{ github.event.inputs.tag_name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: ${{ steps.tag.outputs.tag }}
+          prerelease: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.prerelease == 'true' }}
+          files: |
+            dist/*/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
