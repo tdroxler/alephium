@@ -3,7 +3,6 @@ name: Build native images (all platforms) and publish release
 on:
   push:
     tags: [ "v[0-9]+.[0-9]+.[0-9]+*" ]
-
   workflow_dispatch:
     inputs:
       tag_name:
@@ -16,6 +15,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 env:
   APP_NAME: alephium
@@ -87,19 +87,26 @@ jobs:
           java -version
           sbt --version
 
-      - name: Get version from tag
+      # Simplified version/tag extraction
+      - name: Compute version/tag
         id: get_version
         shell: bash
         run: |
-          if [[ "${GITHUB_REF:-}" =~ refs/tags/v(.+) ]]; then
-            V="${BASH_REMATCH[1]}"
-          elif [[ "${{ github.event.inputs.tag_name }}" =~ v(.+) ]]; then
-            V="${BASH_REMATCH[1]}"
+          set -euo pipefail
+          if [[ "${GITHUB_REF:-}" == refs/tags/* ]]; then
+            tag="${GITHUB_REF#refs/tags/}"                 # e.g., v0.0.1
+            version="${tag#v}"                             # e.g., 0.0.1
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.tag_name }}" ]]; then
+            tag="${{ github.event.inputs.tag_name }}"      # e.g., v0.0.1
+            version="${tag#v}"
           else
-            V="dev"
+            tag=""
+            version="dev"
           fi
-          echo "VERSION=$V" >> $GITHUB_ENV
-          echo "version=$V" >> $GITHUB_OUTPUT
+          echo "TAG=$tag" >> "$GITHUB_ENV"
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Build native image
         shell: bash
@@ -121,11 +128,9 @@ jobs:
           fi
           test -f "$BIN_PATH" || { echo "Binary not found at $BIN_PATH"; ls -lah "$OUT_DIR"; exit 1; }
 
-          # Use a subfolder for all native images (e.g. natives/)
           PKG_DIR="dist/natives"
           mkdir -p "$PKG_DIR"
 
-          # Name includes version, OS, arch, and extension
           TARGET_NAME="${APP_NAME}-${{ env.VERSION }}-${{ runner.os }}-${{ matrix.arch }}${{ matrix.file_ext }}"
           cp "$BIN_PATH" "${PKG_DIR}/${TARGET_NAME}"
           if [ "${{ runner.os }}" != "Windows" ]; then
@@ -142,7 +147,7 @@ jobs:
             ${{ steps.pkg.outputs.artifact_path }}
 
   release:
-    name: Create GitHub Release (tags only)
+    name: Create GitHub Release (attach native assets)
     needs: [build]
     runs-on: ubuntu-22.04
     if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && github.event.inputs.tag_name != '')
@@ -159,19 +164,35 @@ jobs:
         id: tag
         shell: bash
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.tag_name }}" ]; then
-            echo "tag=${{ github.event.inputs.tag_name }}" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          if [[ "${GITHUB_REF:-}" == refs/tags/* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
           else
-            echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            echo "tag=${{ github.event.inputs.tag_name }}" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Create release and upload assets
+      - name: Create or update release (same tag as JARs)
         uses: softprops/action-gh-release@v2
         with:
-          # create a separate release whose tag name is the original tag + "-native"
-          name: ${{ steps.tag.outputs.tag }} native
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: ${{ steps.tag.outputs.tag }}
           prerelease: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.prerelease == 'true' }}
           files: |
             dist/**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Trigger the JAR release workflow AFTER native assets are uploaded
+      - name: Trigger JAR release workflow
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.tag.outputs.tag }}"
+          echo "Dispatching release.yaml for tag: $TAG"
+          curl -sS -L -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/release.yaml/dispatches \
+            -d "{\"ref\":\"$TAG\",\"inputs\":{\"tag_name\":\"$TAG\"}}"
