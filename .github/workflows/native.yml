@@ -107,7 +107,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          sbt "app/GraalVMNativeImage/packageBin"
+          make native
 
       - name: Locate and package binary
         id: pkg

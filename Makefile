@@ -30,6 +30,9 @@ publish-local:
 release:
 	project/release.sh $(version)
 
+native:
+	sbt app/GraalVMNativeImage/packageBin
+
 run:
 	sbt app/run
 
