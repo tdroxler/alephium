@@ -132,17 +132,7 @@ jobs:
             chmod +x "${PKG_DIR}/${TARGET_NAME}"
           fi
 
-          # Optional checksum
-          if command -v shasum >/dev/null 2>&1; then
-            shasum -a 256 "${PKG_DIR}/${TARGET_NAME}" > "${PKG_DIR}/${TARGET_NAME}.sha256"
-          elif command -v sha256sum >/dev/null 2>&1; then
-            sha256sum "${PKG_DIR}/${TARGET_NAME}" > "${PKG_DIR}/${TARGET_NAME}.sha256"
-          fi
-
           echo "artifact_path=${PKG_DIR}/${TARGET_NAME}" >> "$GITHUB_OUTPUT"
-          if [ -f "${PKG_DIR}/${TARGET_NAME}.sha256" ]; then
-            echo "checksum_path=${PKG_DIR}/${TARGET_NAME}.sha256" >> "$GITHUB_OUTPUT"
-          fi
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -150,7 +140,6 @@ jobs:
           name: ${{ env.APP_NAME }}-${{ runner.os }}-${{ matrix.arch }}
           path: |
             ${{ steps.pkg.outputs.artifact_path }}
-            ${{ steps.pkg.outputs.checksum_path }}
 
   release:
     name: Create GitHub Release (tags only)
